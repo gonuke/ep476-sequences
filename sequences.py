@@ -32,19 +32,4 @@ def calc_sequence(initial, length, verbose=False):
 
 if __name__ == "__main__":
           
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("-n", "--number", type=int, default=2, required=False,
-                        help="Determines how many initial numbers are used/necessary to compute the sequence.")
-
-    parser.add_argument("-l", "--length", type=int, default=10, required=False,
-                        help="Determines how many terms in the sequence to calculate and print.")
-
-    parser.add_argument("-v", "--verbose", action='store_true', required=False,
-                        help="Print extra information to the screen during calculation.")
-
-    args = parser.parse_args()
-
-    seq = calc_sequence(args.number, args.length, args.verbose)
-
-    print(seq)
+    pass
