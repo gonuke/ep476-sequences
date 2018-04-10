@@ -1,8 +1,9 @@
+import yaml
+
 import seq_driver
 
 import seq_input
 
-import yaml
 
 seq_driver.print_seq_dict(seq_driver.seq_driver_generic(seq_input.init_list, seq_input.length))
 
