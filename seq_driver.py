@@ -115,19 +115,59 @@ def write_seq_dict_csv(filename, seq_dict):
             seq_writer.writerow(list(key)+val)
     
 
+seq_group_name = 'sequences'
+    
+def get_existing_seqs(h5file):
+    """
+    Get a list of the sequnces that are already stored in the file.
+
+    inputs:
+    -------
+    h5file : a file handle for an open HDF5 file
+
+    outputs:
+    --------
+    seq_list : set(tuple(init,length)) set of existing sequences defined by their 
+               initial number and length
+    """
+    
+    seq_list = set()
+    for seq in h5file.walk_nodes('/' + seq_group_name,'Array'):
+        seq_list.add((seq.attrs.init,seq.attrs.length))
+
+    return seq_list
+
 def write_seq_dict_hdf5(filename, seq_dict):
+    """
+    Write a sequence dictionary to an HDF5 formatted file.
+    
+    A new group will be 
+
+    inputs:
+    -------
+    filename : (string) the name of the file to write
+    seq_dict : dict{(initial,length) : list(integer)} dictionary of all the 
+               resulting sequences of integers
+    """
 
     f = tb.open_file(filename, 'a')
 
-    f.create_group('/','sequences',"My Sequences")
+    try:
+        seq_node = f.get_node('/' + seq_group_name)
+        seq_list = get_existing_seqs(f)
+        seq_idx = len(seq_list)
+    except tb.NoSuchNodeError:
+        f.create_group('/', seq_group_name, "My Sequences")
+        seq_list = set()
+        seq_idx = 0
 
-    seq_idx = 0
     for key,val in seq_dict.items():
-        seq_name = "seq"+str(seq_idx)
-        seq_array = f.create_array('/sequences',seq_name,val)
-        seq_array.attrs.init = key[0]
-        seq_array.attrs.length = key[1]
-        seq_idx += 1
+        if key not in seq_list:
+            seq_name = "seq"+str(seq_idx)
+            seq_array = f.create_array('/' + seq_group_name,seq_name,val)
+            seq_array.attrs.init = key[0]
+            seq_array.attrs.length = key[1]
+            seq_idx += 1
 
     f.close()
                                    
@@ -153,8 +193,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-#    pdb.set_trace()
-    
     seq_dict = seq_driver_incr(args.max_number, args.length, args.verbose)
 
     if args.verbose:
