@@ -1,3 +1,7 @@
+import pdb
+import csv
+import tables as tb
+
 import argparse
 
 import sequences
@@ -51,11 +55,42 @@ def seq_driver_generic(initial_list, length, verbose=False):
 
     return seq_dict
 
-def print_seq_dict(seq_dict):
+def seq_dict_str(seq_dict):
+    """
+    Generate a string version of a sequence dictionary in the format:
+    key : sequence
+    where key is the tuple that defines the sequence and sequence is the list of integers.
 
-    print("\n".join(["{0} : {1}".format(key,val) for key,val in seq_dict.items()]))
+    inputs:
+    -------
+    seq_dict : dict{(initial,length) : list(integer)} dictionary of all the 
+               resulting sequences of integers
 
+    outputs:
+    --------
+    seq_string : (string) formatted as above
+    """
+    
+    return "\n".join(["{0} : {1}".format(key,val) for key,val in seq_dict.items()])
 
+def write_seq_dict_txt(filename, seq_dict):
+    """
+    Print a sequence dictionary to standard out in the format:
+    key : sequence
+    where key is the tuple that defines the sequence and sequence is the list of integers.
+
+    inputs:
+    -------
+    filename : (string) the name of the file to write
+    seq_dict : dict{(initial,length) : list(integer)} dictionary of all the 
+               resulting sequences of integers
+    
+    """
+
+    with open(filename, 'w') as file:
+        file.write(seq_dict_str(seq_dict))
+
+    
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -66,6 +101,9 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--length", type=int, default=10, required=False,
                         help="Determines how many terms in the sequence to calculate and print.")
 
+    parser.add_argument("-f", "--filename", type=str, default="sequences.txt", required=False,
+                        help="Filename to store sequences in CSV version.")
+
     parser.add_argument("-v", "--verbose", action='store_true', required=False,
                         help="Print extra information to the screen during calculation.")
 
@@ -73,4 +111,10 @@ if __name__ == "__main__":
 
     seq_dict = seq_driver_incr(args.max_number, args.length, args.verbose)
 
-    print_seq_dict(seq_dict)
+    if args.verbose:
+        print(seq_dict_str(seq_dict))
+
+    write_seq_dict_txt(args.filename,seq_dict)
+        
+
+        
